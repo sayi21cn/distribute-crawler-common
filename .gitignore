@@ -1,0 +1,8 @@
+/target
+*.git
+*.logs
+*.project
+*.classpath
+*.settings
+*.bat
+*.sh
