@@ -1,5 +1,9 @@
 package xu.main.java.distribute_crawler_common.vo;
-
+/**
+ * 任务记录，对应数据库task表
+ * @author xu
+ *
+ */
 public class TaskRecord {
 	private int id;
 	private String task_name;
