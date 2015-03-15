@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +15,8 @@ import xu.main.java.distribute_crawler_common.util.StringHandler;
 import xu.main.java.distribute_crawler_common.vo.HtmlPath;
 
 public class CssExtractor implements IExtractor {
+
+	private static Logger logger = Logger.getLogger(CssExtractor.class);
 
 	public Map<String, String> extractorColumns(String html, List<HtmlPath> pathList, String dbSplitString) {
 		Map<String, String> resultMap = new HashMap<String, String>();
@@ -28,6 +31,9 @@ public class CssExtractor implements IExtractor {
 			StringBuffer resultBuffer = new StringBuffer();
 			if (null != cssPath.getDirPathList()) {
 				elements = findElements(document, cssPath.getDirPathList(), cssPath.getDirIndexList());
+			}
+			if (null == elements) {
+				continue;
 			}
 			for (int index = 0, len = elements.size(); index < len; index++) {
 				Element element = elements.get(index);
@@ -54,7 +60,7 @@ public class CssExtractor implements IExtractor {
 			int elementIndex = elementIndexList.get(pathIndex);
 			elements = element1.select(path);
 			if (elements.size() <= elementIndex) {
-				System.out.println("路径错误 " + path + " 获取组件数 : " + elements.size() + " 要抽取的组件索引: " + elementIndex);
+				logger.warn("路径错误 " + path + " 获取组件数 : " + elements.size() + " 要抽取的组件索引: " + elementIndex);
 				return null;
 			}
 			element1 = elements.get(elementIndex);
@@ -81,6 +87,9 @@ public class CssExtractor implements IExtractor {
 		// element1 = elements.get(elementIndex);
 		// }
 		Elements elements = findElements(element, pathList, elementIndexList);
+		if (null == elements) {
+			return null;
+		}
 		return elements.get(elementIndexList.get(pathList.size() - 1));
 	}
 
