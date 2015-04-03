@@ -1,8 +1,8 @@
 /target
+/bin
+/etc
 *.git
 *.logs
 *.project
 *.classpath
 *.settings
-*.bat
-*.sh
