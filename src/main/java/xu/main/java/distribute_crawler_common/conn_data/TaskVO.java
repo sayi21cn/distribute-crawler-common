@@ -1,4 +1,4 @@
-package xu.main.java.distribute_crawler_common.nio_data;
+package xu.main.java.distribute_crawler_common.conn_data;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -37,10 +37,10 @@ public class TaskVO {
 
 	private Queue<String> resultInsertSqlQueue = new LinkedBlockingDeque<String>();
 
-	public boolean offerInsertSql(String sql){
+	public boolean offerInsertSql(String sql) {
 		return resultInsertSqlQueue.offer(sql);
 	}
-	
+
 	public String pollInsertSql() {
 		return resultInsertSqlQueue.poll();
 	}
