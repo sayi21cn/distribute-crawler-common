@@ -33,6 +33,8 @@ public class TaskVO {
 	/* 完成进度 0-100 计算方法: alreadyCrawledUrlNum*100/urlCount 取整 */
 	private int speedProgress = 0;
 
+	private int lastSpeedFeedback = 0;
+
 	private Queue<String> urlQueue = new LinkedBlockingDeque<String>();
 
 	private Queue<String> resultInsertSqlQueue = new LinkedBlockingDeque<String>();
@@ -148,6 +150,14 @@ public class TaskVO {
 
 	public void setUrlQueue(Queue<String> urlQueue) {
 		this.urlQueue = urlQueue;
+	}
+
+	public int getLastSpeedFeedback() {
+		return lastSpeedFeedback;
+	}
+
+	public void setLastSpeedFeedback(int lastSpeedFeedback) {
+		this.lastSpeedFeedback = lastSpeedFeedback;
 	}
 
 }
