@@ -15,11 +15,11 @@ public class StringHandler {
 		return null == input || "".equals(input);
 	}
 
-	public static String nullToEmpty(String input) {
-		if (null == input) {
+	public static String nullToEmpty(Object o) {
+		if (null == o) {
 			return "";
 		}
-		return input;
+		return o.toString();
 	}
 
 }
