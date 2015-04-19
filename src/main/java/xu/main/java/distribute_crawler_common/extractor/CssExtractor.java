@@ -37,9 +37,9 @@ public class CssExtractor implements IExtractor {
 			}
 			for (int index = 0, len = elements.size(); index < len; index++) {
 				Element element = elements.get(index);
-				element = findElement(element, cssPath.getPathList(), cssPath.getPathIndexList());
+				findElement(element, cssPath.getPathList(), cssPath.getPathIndexList());
 				if (StringHandler.isNullOrEmpty(cssPath.getAttrName())) {
-					resultBuffer.append(element.text()).append(dbSplitString);
+					resultBuffer.append(null == element ? "" : element.text()).append(dbSplitString);
 					continue;
 				}
 				resultBuffer.append(element.attr(cssPath.getAttrName())).append(dbSplitString);
@@ -68,10 +68,10 @@ public class CssExtractor implements IExtractor {
 		return elements;
 	}
 
-	public static Element findElement(Element element, List<String> pathList, List<Integer> elementIndexList) {
+	public static void findElement(Element element, List<String> pathList, List<Integer> elementIndexList) {
 
 		if (null == pathList || pathList.size() < 1 || pathList.size() != elementIndexList.size()) {
-			return null;
+			return;
 		}
 		// Element element1 = element;
 		// for (int pathIndex = 0, len = pathList.size(); pathIndex < len;
@@ -88,9 +88,9 @@ public class CssExtractor implements IExtractor {
 		// }
 		Elements elements = findElements(element, pathList, elementIndexList);
 		if (null == elements) {
-			return null;
+			return;
 		}
-		return elements.get(elementIndexList.get(pathList.size() - 1));
+		element = elements.get(elementIndexList.get(pathList.size() - 1));
 	}
 
 	public static void main(String[] args) {
@@ -98,9 +98,9 @@ public class CssExtractor implements IExtractor {
 		Document document = Jsoup.parse(html);
 		List<String> pathList = Arrays.asList("table", "tbody", "tr", "td", "b", "a");
 		List<Integer> elementIndexList = Arrays.asList(0, 0, 1, 1, 0, 0);
-		Element element = findElement(document, pathList, elementIndexList);
-		System.out.println(element.text());
-		System.out.println(element.attr("href"));
+		findElement(document, pathList, elementIndexList);
+		System.out.println(document.text());
+		System.out.println(document.attr("href"));
 	}
 
 }
