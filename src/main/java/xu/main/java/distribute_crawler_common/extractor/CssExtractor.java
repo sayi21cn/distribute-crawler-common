@@ -1,5 +1,6 @@
 package xu.main.java.distribute_crawler_common.extractor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import xu.main.java.distribute_crawler_common.util.GsonUtil;
+import xu.main.java.distribute_crawler_common.util.HttpDownload;
 import xu.main.java.distribute_crawler_common.util.StringHandler;
 import xu.main.java.distribute_crawler_common.vo.HtmlPath;
 
@@ -37,12 +40,16 @@ public class CssExtractor implements IExtractor {
 			}
 			for (int index = 0, len = elements.size(); index < len; index++) {
 				Element element = elements.get(index);
-				findElement(element, cssPath.getPathList(), cssPath.getPathIndexList());
-				if (StringHandler.isNullOrEmpty(cssPath.getAttrName())) {
-					resultBuffer.append(null == element ? "" : element.text()).append(dbSplitString);
+				Element resultEle = findElement(element, cssPath.getPathList(), cssPath.getPathIndexList());
+				if (null == resultEle) {
+					logger.error(String.format("CssExtractor findElement NULL"));
 					continue;
 				}
-				resultBuffer.append(element.attr(cssPath.getAttrName())).append(dbSplitString);
+				if (StringHandler.isNullOrEmpty(cssPath.getAttrName())) {
+					resultBuffer.append(null == resultEle ? "" : resultEle.text()).append(dbSplitString);
+					continue;
+				}
+				resultBuffer.append(resultEle.attr(cssPath.getAttrName())).append(dbSplitString);
 			}
 			resultMap.put(cssPath.getPathName(), resultBuffer.toString());
 		}
@@ -68,10 +75,10 @@ public class CssExtractor implements IExtractor {
 		return elements;
 	}
 
-	public static void findElement(Element element, List<String> pathList, List<Integer> elementIndexList) {
+	public static Element findElement(Element element, List<String> pathList, List<Integer> elementIndexList) {
 
 		if (null == pathList || pathList.size() < 1 || pathList.size() != elementIndexList.size()) {
-			return;
+			return null;
 		}
 		// Element element1 = element;
 		// for (int pathIndex = 0, len = pathList.size(); pathIndex < len;
@@ -88,19 +95,35 @@ public class CssExtractor implements IExtractor {
 		// }
 		Elements elements = findElements(element, pathList, elementIndexList);
 		if (null == elements) {
-			return;
+			return null;
 		}
-		element = elements.get(elementIndexList.get(pathList.size() - 1));
+		return elements.get(elementIndexList.get(pathList.size() - 1));
 	}
 
 	public static void main(String[] args) {
 		String html = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"tbspan\" style=\"margin-top:6px\"><tbody><tr> <td height=\"1\" colspan=\"2\" background=\"/templets/img/dot_hor.gif\"></td></tr><tr> <td width=\"5%\" height=\"26\" align=\"center\"><img src=\"/templets/img/item.gif\" width=\"18\" height=\"17\"></td><td height=\"26\">	<b>				<a href=\"/html/gndy/dyzz/20150212/47357.html\" class=\"ulink\">2014年爱情喜剧《单身男女2》BD国粤双语中字</a>	</b></td></tr><tr> <td height=\"20\" style=\"padding-left:3px\">&nbsp;</td><td style=\"padding-left:3px\">				<font color=\"#8F8C89\">日期：2015-02-12 23:10:09 点击：0 </font>						</td></tr><tr> <td colspan=\"2\" style=\"padding-left:3px\">◎又 名 单身男女2 ◎片 名 Don't Go Breaking My Heart ◎年 代 2014 ◎国 家 中国香港/中国 ◎类 别 喜剧/爱情 ◎语 言 普通话/粤语 ◎字 幕 中文 ◎IMDB评分 5.2/10 from 108 users ◎文件格式 x264 + AAC ◎视频尺寸 1280 x 720 ◎文件大� �1CD ◎片 长 113 Mins</td></tr></tbody></table>";
-		Document document = Jsoup.parse(html);
-		List<String> pathList = Arrays.asList("table", "tbody", "tr", "td", "b", "a");
-		List<Integer> elementIndexList = Arrays.asList(0, 0, 1, 1, 0, 0);
-		findElement(document, pathList, elementIndexList);
-		System.out.println(document.text());
-		System.out.println(document.attr("href"));
+		String url = "http://www.ygdy8.net/html/gndy/dyzz/list_23_1.html";
+		html = HttpDownload.download(url, "gb2312");
+		List<HtmlPath> pathListh = new ArrayList<HtmlPath>();
+
+		List<String> dirPathList = Arrays.asList(".co_content8 > ul", "table");
+		List<Integer> dirIndexList = Arrays.asList(0, 0);
+		List<String> pathList = Arrays.asList("tbody", "tr", "td", "b", "a");
+		List<Integer> pathIndexList = Arrays.asList(0, 1, 1, 0, 0);
+
+		HtmlPath htmlPath = new HtmlPath();
+		htmlPath.setDirPathList(dirPathList);
+		htmlPath.setDirIndexList(dirIndexList);
+
+		htmlPath.setPathList(pathList);
+		htmlPath.setPathIndexList(pathIndexList);
+		htmlPath.setAttrName("href");
+		htmlPath.setPathName("detail_url");
+
+		pathListh.add(htmlPath);
+		CssExtractor cssExtractor = new CssExtractor();
+		Map<String, String> resultMap = cssExtractor.extractorColumns(html, pathListh, "###");
+		System.out.println(GsonUtil.toJson(resultMap));
 	}
 
 }
